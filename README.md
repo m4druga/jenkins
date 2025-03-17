@@ -1,44 +1,59 @@
-# Welcome
+# Jenkins Pipeline for Database Environments
 
 ## Overview
 
-This archive contains files for our basic Jenkins pipeline to automatically create MySQL database instance - running on Docker, so our developers can have their very own environment to use.
+This Jenkins pipeline automates the setup and management of MySQL and PostgreSQL database environments using Docker. 
+It supports multi-database deployment, user creation, and database initialization with predefined structures.
 
-This archive contains all the files being used by the current version of the pipeline.
+This archive contains all the files used in the current version of the pipeline:
 
 ```
-|-- Dockerfile
+|-- Dockerfile.mysql
+|-- Dockerfile.psql
 |-- build-dev-environment.groovy
 `-- include
-    `-- create_developer.template
+    |-- create_developer_mysql.template
+    `-- create_developer_psql.template
 ```
 
-## Preparation
+## Features
 
-- Please upload your solution to GitHub into a public repository and share the URL in reply e-mail
+- **Supports MySQL and PostgreSQL**: Users can select the database engine at runtime.
+- **Automated Database Setup**: The pipeline initializes databases, creates necessary tables, and configures user permissions.
+- **Parameterized Builds**: Allows flexible configuration via Jenkins parameters.
+- **Improved Error Handling**: Validates input parameters and checks service readiness before proceeding.
+- **Scalable and Modular**: The approach ensures easy extension and maintenance.
 
-## Expected behaviour
+## Approach and Enhancements
 
-- Developers can trigger the pipeline with parameters (Environment name, MySQL password and MySQL port)
-- A docker image built from latest MySQL image
-- Spin up a container from the image built above, exposing the requested port on the Docker host
-- Prepare the environment by creating an account for the developer (username: developer, password: based on input parameter)
+This project refactored and improved the original pipeline to address issues and introduce new functionalities. Below are the key enhancements:
 
-## Issues
+### 1. Bug Fixes and Process Improvements
 
-- The pipeline fails randomly in Jenkins
-- If it works, developers are still not able to login into the running MySQL container because of an unknown issue. Please fix these issue before moving to the next part.
+- **Fixed incorrect user creation in MySQL**: Ensured database existence before creating users.
+- **Validated database port input**: Prevents misconfigurations due to invalid port numbers.
+- **Added MySQL readiness check**: Avoids executing SQL scripts before the service is available.
+- **Enhanced user privileges**: MySQL users now support external connections.
 
-## Further improvement requests
+### 2. Feature Enhancements
 
-- Pipeline should fail if the MySQL port parameter is not a valid number within port range
-- Developers would also need a table called "departments" under the "DEVAPP" database with the following columns and with some demo data populated
-    - DEPT - number 4 digit
-    - DEPT_NAME - varchar 250
-- Please share any observation / recommendation you might have on this process
+- **Multi-Database Support**: Introduced PostgreSQL as an alternative to MySQL.
+- **Database Schema Initialization**: Added `departments` table with sample data.
+- **Improved Parameterization**: Users can now specify database engine, port, and credentials.
 
-## Optional
-- Extend the pipeline with ability to switch database engine and implement the same scope using either:
-    - [OracleXE](https://container-registry.oracle.com/ords/f?p=113:4:3559407972469:::4:P4_REPOSITORY,AI_REPOSITORY,AI_REPOSITORY_NAME,P4_REPOSITORY_NAME,P4_EULA_ID,P4_BUSINESS_AREA_ID:803,803,Oracle%20Database%20Express%20Edition,Oracle%20Database%20Express%20Edition,1,0&cs=3DRUVeYjFotraARk1_SIQT-gpXHdclgNeRODkR0y5bUs8pMZHRZgRESapOWM2F4DJVgxuFhP_eLjQZFewWuqYRw)
-    OR
-    - [PostgreSQL](https://hub.docker.com/_/postgres/)
+### 3. Pipeline Optimization
+
+- **Refactored Docker Build Process**: Separate Dockerfiles for MySQL and PostgreSQL.
+- **Optimized Container Initialization**: Ensured proper sequencing of database setup steps.
+- **Improved Jenkins Stages**: Added validation and conditional execution logic.
+
+## Usage
+
+1. Configure the pipeline in Jenkins.
+2. Provide the required parameters:
+   - `DATABASE_ENGINE`: Choose between `mysql` or `postgres`.
+   - `ENVIRONMENT_NAME`: Name of the database environment.
+   - `DB_PASSWORD`: Root password for MySQL or `POSTGRES_PASSWORD` for PostgreSQL.
+   - `DB_PORT`: Port to expose the database service.
+   - `SKIP_STEP_1`: Skip Docker image build step if already built.
+3. Trigger the pipeline and monitor execution logs.
