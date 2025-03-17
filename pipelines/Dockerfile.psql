@@ -1,0 +1,5 @@
+FROM postgres:latest
+
+COPY include/create_developer_psql.sql /docker-entrypoint-initdb.d/
+
+EXPOSE 5432

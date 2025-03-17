@@ -1,0 +1,16 @@
+CREATE TABLE IF NOT EXISTS departments (
+    dept INT PRIMARY KEY,
+    dept_name VARCHAR(250)
+);
+
+INSERT INTO departments (dept, dept_name) VALUES
+(1001, 'Sales'),
+(1002, 'Engineering'),
+(1003, 'Human Resources');
+
+CREATE USER developer WITH PASSWORD '<PASSWORD>';
+
+GRANT CONNECT, CREATE ON DATABASE devapp TO developer;
+GRANT USAGE, CREATE ON SCHEMA public TO developer;
+GRANT SELECT, INSERT, UPDATE, DELETE, REFERENCES ON ALL TABLES IN SCHEMA public TO developer;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE, REFERENCES ON TABLES TO developer;
